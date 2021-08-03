@@ -18,9 +18,31 @@ const db = mysql.createConnection(
   console.log(`Connected to the movie_db database.`)
 );
 
-app.get('/', (req, res) =>
-  res.sendFile(path.join(__dirname, '/api/movies'))
-);
+app.get('/api/movies', (req, res) => {
+
+db.query('SELECT * FROM movies', function (err, results) {
+  if (err) {
+    res.status(400).json({error : err.message});
+    return 
+  }
+  res.json({
+    message: 'Successful!',
+    data : results})
+});
+})
+
+app.post('/api/add-movie', ({body}, res) => {
+  db.query(`INSERT INTO movies (movie_name) VALUES (?)`, [body.movie_name], function (err, results) {
+    if (err) {
+      res.status(400).json({error : err.message});
+      return 
+    }
+    res.json({
+      message: 'Successful!',
+      data : body})
+  });
+}
+)
 
 app.listen(PORT, () =>
   console.log(`App listening at http://localhost:${PORT} 🚀`)
